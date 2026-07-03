@@ -1,16 +1,14 @@
 import streamlit as st
-from pydub import AudioSegment
-import io
 
 # Page Configuration
 st.set_page_config(
-    page_title="Audio Speed Studio",
+    page_title="Audio Player Studio",
     page_icon="🎵",
     layout="centered"
 )
 
-st.title("🎵 Audio Speed Studio")
-st.write("Upload an audio file and change its playback speed.")
+st.title("🎵 Audio Player Studio")
+st.write("Upload an audio file and listen to it instantly!")
 
 # Upload Audio
 uploaded_file = st.file_uploader(
@@ -20,49 +18,20 @@ uploaded_file = st.file_uploader(
 
 if uploaded_file is not None:
 
-    # Load audio
-    audio = AudioSegment.from_file(uploaded_file)
-
-    st.sidebar.header("🎚 Audio Controls")
-
-    speed = st.sidebar.slider(
-        "Playback Speed",
-        min_value=0.5,
-        max_value=2.0,
-        value=1.0,
-        step=0.1
-    )
-
-    # Change playback speed
-    modified_audio = audio._spawn(
-        audio.raw_data,
-        overrides={
-            "frame_rate": int(audio.frame_rate * speed)
-        }
-    ).set_frame_rate(audio.frame_rate)
-
-    # Audio Information
-    st.subheader("🎧 Audio Information")
-    st.write(f"Duration: {len(audio)/1000:.2f} seconds")
-    st.write(f"Channels: {audio.channels}")
-    st.write(f"Frame Rate: {audio.frame_rate} Hz")
-
-    st.subheader("▶ Original Audio")
+    st.subheader("🎧 Audio Player")
     st.audio(uploaded_file)
 
-    # Export modified audio
-    buffer = io.BytesIO()
-    modified_audio.export(buffer, format="mp3")
-    buffer.seek(0)
+    st.subheader("📄 File Information")
 
-    st.subheader("⏩ Modified Audio")
-    st.audio(buffer)
+    st.write(f"**Filename:** {uploaded_file.name}")
+    st.write(f"**File Type:** {uploaded_file.type}")
+    st.write(f"**File Size:** {uploaded_file.size / 1024:.2f} KB")
 
     st.download_button(
-        label="📥 Download Modified Audio",
-        data=buffer,
-        file_name="modified_audio.mp3",
-        mime="audio/mpeg"
+        label="📥 Download Audio",
+        data=uploaded_file,
+        file_name=uploaded_file.name,
+        mime=uploaded_file.type
     )
 
 else:
